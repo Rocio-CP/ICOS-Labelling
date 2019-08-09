@@ -5,21 +5,24 @@
 ### The current QuinCamilla cannot calculate correct fCO2 for FOS data, and does
 ### not deal with oxygen or pH at all. Therefore these calculations will happen
 ### in this script instead. Script will also plot these.
+getwd()
 
+getSrcDirectory(function(x) {x})
 
+getwd()
 
 ##-----------------------------------------------------------------------------
 # Input params to be assigned:
 
 
-sepp <- "\t"                                      # File separator used
+sepp <- "," #"\t"                                      # File separator used
 date_col <-c(2,3,4)
 time_col <- c(5,6,7)
 dt_format <- "%Y %m %d %H %M %S"                  # e.g. "%d/%m/%y %H:%M:%S"
 
 which_CO2 <- "pCO2"                               # Choose between xCO2 and pCO2 
 CO2_name <- "pCO2_uatm"                           # Use dots instead of space
-Peq_name <- "Peq"          # Use "c(1000)" if this is not measured.
+Peq_name <- "c(1000)"          # Use "c(1000)" if this is not measured.
 
 is_O2 <- TRUE
 is_pH <- FALSE
@@ -28,17 +31,19 @@ O2_name <- "Oxygen_umol_pr_l"
 O2_calculations <- "no"                           # Fill inn "no" if calculations are not needed, "yes" if it is needed
 
 pH_name <- "pH"
-pH_temp_name <- "pH_Temp"
+pH_temp_name <- "pH.Temp"
 
-is_pressure <- FALSE                                   # Pressure related to depth
-pressure_name <- "Pressure_dbar"    
+is_pressure <- FALSE                                 # Pressure related to depth
+pressure_name <- ""    
+is_depth <- TRUE
+depth_name <- "Depth_m"
 
 is_cond <- FALSE
 cond_name <- "sbe37po_cond"
 
 O2_letter <- "e)"                                    # Lettering for measurement plot in report
-pH_letter <- "e)"
-press_letter <- NA
+pH_letter <- "f)"
+press_letter <- "c)"
 cond_letter <- NA
 letter_position <- "bottomright"                    # Depends on where letters are in other measurement plots
 
@@ -112,9 +117,6 @@ if (which_CO2 == "xCO2"){
   
 }
     
-   
-    
-    
     # Calculate fCO2 (based on equation is Steve's document "Fixing wet stations")
     fCO2 <-  rep(0, length(df_sub[,1]))
     for (l in 1:length(fCO2))  {
@@ -133,7 +135,8 @@ if (which_CO2 == "xCO2"){
     # Plot fCO2  vs. time 
     png(paste(output_dir, "/", "1_fCO2_time_", "plot.png", sep=""))
     par(mar=c(5,5,2,2))
-    tryCatch(plot(df_sub$date.time, df_sub$fCO2, ylim=c(100,1200), ylab = expression("fCO"[2]*" ["*mu*"atm]"), xlab = "Time", cex.lab=1.5, cex.axis=1.3), error=function(e) {})
+#    tryCatch(plot(df_sub$date.time, df_sub$fCO2, ylim=c(100,1200), ylab = expression("fCO"[2]*" ["*mu*"atm]"), xlab = "Time", cex.lab=1.5, cex.axis=1.3), error=function(e) {})
+    tryCatch(plot(df_sub$date.time, df_sub$fCO2, ylab = expression("fCO"[2]*" ["*mu*"atm]"), xlab = "Time", cex.lab=1.5, cex.axis=1.3), error=function(e) {})
     if(which_CO2=="xCO2") {
      legend("bottomright", "a)", bty="n", cex=2.5) 
     }
@@ -143,8 +146,9 @@ if (which_CO2 == "xCO2"){
      # Plot fCO2 vs xCO2
      png(paste(output_dir, "/", "2_fCO2_xCO2_", "plot.png", sep=""))
      par(mar=c(5,5,2,2))
-     tryCatch(plot(df_sub[[CO2_name]], df_sub$fCO2, ylab = expression("fCO"[2]*" ["*mu*"atm]"), xlab = expression("pCO"[2]*" ["*mu*"atm]"), ylim=c(200,500),xlim=c(200,500), cex.lab=1.5,cex.axis=1.3), error=function(e) {})
-     legend("bottomright", "b)", bty="n", cex=2.5) 
+     #tryCatch(plot(df_sub[[CO2_name]], df_sub$fCO2, ylab = expression("fCO"[2]*" ["*mu*"atm]"), xlab = expression("pCO"[2]*" ["*mu*"atm]"), ylim=c(200,500),xlim=c(200,500), cex.lab=1.5,cex.axis=1.3), error=function(e) {})
+     tryCatch(plot(df_sub[[CO2_name]], df_sub$fCO2, ylab = expression("fCO"[2]*" ["*mu*"atm]"), xlab = expression("xCO"[2]*" ["*mu*"atm]"), cex.lab=1.5,cex.axis=1.3), error=function(e) {})
+      legend("bottomright", "b)", bty="n", cex=2.5) 
      dev.off()
     }
  
@@ -162,7 +166,8 @@ if (which_CO2 == "xCO2"){
      #tryCatch(plot(df_sub$date.time, df_sub[[O2_name]], ylab = expression("O"[2]*" ["*mu*"mol/kg]"), xlab = "Time", cex.lab=1.5,cex.axis=1.3), error=function(e) {})
     # tryCatch(plot(df_sub$date.time, df_sub[[O2_name]], ylab = expression("O"[2]*" [ml/l]"), ylim=c(4,6), xlab = "Time", cex.lab=1.5,cex.axis=1.3), error=function(e) {})
      #tryCatch(plot(df_sub$date.time, df_sub[[O2_name]], ylab = expression("O"[2]*" ["*mu*"M]"), xlab = "Time", cex.lab=1.5,cex.axis=1.3), error=function(e) {})
-    legend(letter_position, O2_letter, bty="n", cex=2.5) 
+    #legend(letter_position, O2_letter, bty="n", cex=2.5) 
+    legend("topright", O2_letter, bty="n", cex=2.5) 
     dev.off()
   
     
@@ -190,7 +195,7 @@ if (which_CO2 == "xCO2"){
       png(paste(output_dir, "/", "4_O2_time_", "plot.png", sep=""))
       par(mar=c(5,5,2,2))
       tryCatch(plot(df_sub$date.time, df_sub$calc_O2, ylab = expression("O"[2]*" ["*mu*"M]"), xlab = "Time", cex.lab=1.5,cex.axis=1.3), error=function(e) {})
-      legend("bottomleft", "e)", bty="n", cex=2.5) 
+      legend("topright", "e)", bty="n", cex=2.5) 
       dev.off()
     
     
@@ -198,7 +203,7 @@ if (which_CO2 == "xCO2"){
       png(paste(output_dir, "/", "5_O2_meas_vs_calc_", "plot.png", sep=""))
       par(mar=c(5,5,2,2))
       tryCatch(plot(df_sub[[O2_name]], df_sub$calc_O2, ylab = expression("Calculated O"[2]*" ["*mu*"M]"), xlab = expression("Measured O"[2]*" ["*mu*"M]"), cex.lab=1.5,cex.axis=1.3), error=function(e) {})
-      legend("topright", "b)", bty="n", cex=2.5) 
+      legend("bottomright", "b)", bty="n", cex=2.5) 
       dev.off()
     }    
     
@@ -229,22 +234,30 @@ if (which_CO2 == "xCO2"){
     # Plot measured pH vs time
     png(paste(output_dir, "/", "6_measured_pH_time_", "plot.png", sep=""))
     par(mar=c(5,5,2,2))
-    tryCatch(plot(df_sub$date.time, df_sub[[pH_name]], ylab = "pH", xlab = "Time", cex.lab=1.5,cex.axis=1.3), error=function(e) {})
+#    tryCatch(plot(df_sub$date.time, df_sub[[pH_name]], ylab = "pH", xlab = "Time", cex.lab=1.5,cex.axis=1.3), error=function(e) {})
+    tryCatch(plot(df_sub$date.time, df_sub[[pH_name]], ylab = "pH", xlab = "Time", 
+                  ylim=c(7.5,8.5), cex.lab=1.5,cex.axis=1.3), error=function(e) {})
     legend(letter_position, pH_letter, bty="n", cex=2.5) 
     dev.off()
     
     # Plot calculated pH vs time
     png(paste(output_dir, "/", "7_pH_time_", "plot.png", sep=""))
     par(mar=c(5,5,2,2))
-    tryCatch(plot(df_sub$date.time, df_sub$calc_pH, ylab = "pH", xlab = "Time", cex.lab=1.5,cex.axis=1.3), error=function(e) {})
-    legend("topright", "a)", bty="n", cex=2.5) 
+ #   tryCatch(plot(df_sub$date.time, df_sub$calc_pH, ylab = "pH", xlab = "Time", cex.lab=1.5,cex.axis=1.3), error=function(e) {})
+    tryCatch(plot(df_sub$date.time, df_sub$calc_pH, ylab = "pH", xlab = "Time", 
+                  ylim=c(7.5,8.5),cex.lab=1.5,cex.axis=1.3), error=function(e) {})
+    legend("bottomright", "a)", bty="n", cex=2.5) 
     dev.off()
  
     # Plot calculated pH vs measured pH 
     png(paste(output_dir, "/", "8_pH_meas_vs_calc_", "plot.png", sep=""))
     par(mar=c(5,5,2,2))
-    tryCatch(plot(df_sub[[pH_name]], df_sub$calc_pH, ylab = "Calculated pH", xlab = "Measured pH", cex.lab=1.5,cex.axis=1.3), error=function(e) {})
-    legend("topright", "b)", bty="n", cex=2.5) 
+ #   tryCatch(plot(df_sub[[pH_name]], df_sub$calc_pH, ylab = "Calculated pH", xlab = "Measured pH", cex.lab=1.5,cex.axis=1.3), error=function(e) {})
+    tryCatch(plot(df_sub[[pH_name]], df_sub$calc_pH, 
+                  ylab = "Calculated pH", xlab = "Measured pH", 
+                  ylim=c(7.5,8.5), xlim=c(7.5,8.5),
+                  cex.lab=1.5,cex.axis=1.3), error=function(e) {})
+    legend("bottomright", "b)", bty="n", cex=2.5) 
     dev.off()
   
     
@@ -268,6 +281,15 @@ if (is_pressure==TRUE) {
   png(paste(output_dir, "/", "9_pressure_", "plot.png", sep=""))
   par(mar=c(5,5,2,2))
   tryCatch(plot(df_sub$date.time, df_sub[[pressure_name]], ylab = "Pressure [dbar]", xlab = "Time", cex.lab=1.5,cex.axis=1.3), error=function(e) {})
+  legend(letter_position, press_letter, bty="n", cex=2.5) 
+  dev.off()
+}
+
+# Plot depth if provided
+if (is_depth==TRUE) {
+  png(paste(output_dir, "/", "9_depth_", "plot.png", sep=""))
+  par(mar=c(5,5,2,2))
+  tryCatch(plot(df_sub$date.time, df_sub[[depth_name]], ylab = "Depth [m]", xlab = "Time", cex.lab=1.5,cex.axis=1.3), error=function(e) {})
   legend(letter_position, press_letter, bty="n", cex=2.5) 
   dev.off()
 }

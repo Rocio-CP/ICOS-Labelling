@@ -18,6 +18,9 @@
 
 ##-----------------------------------------------------------------------------
 ##-----------------------------------------------------------------------------
+# Set working directory to file location
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+
 # Input params to be assigned:
 
 # Which ID_name (look in json file) is used for the parameters we wish to extract

@@ -12,14 +12,14 @@
 #if (!input_from_main) {
 
 plot_SST <- TRUE                      # Core for VOS and FOS
-plot_eqTemp <- FALSE                   # Core for VOS
-plot_sal <- TRUE                     # Core for FOS
-plot_eqPress <- FALSE                  # Core for VOS
-plot_xCO2sw <- FALSE                   # xCO2 or pCO2 is core for VOS and FOS
-plot_pCO2sw <- TRUE
+plot_eqTemp <- TRUE                   # Core for VOS
+plot_sal <- FALSE                     # Core for FOS
+plot_eqPress <- TRUE                  # Core for VOS
+plot_xCO2sw <- TRUE                   # xCO2 or pCO2 is core for VOS and FOS
+plot_pCO2sw <- FALSE
 plot_DepthPressure <- FALSE           # Pressure (depth) is plotted for FOS, but in another script. The reason we need to know this here is for the plot lettering
 
-letter_location <- "topright"      # Alternatives are "bottomright", "bottomleft", "topleft", "topright"
+letter_location <- "bottomright"      # Alternatives are "bottomright", "bottomleft", "topleft", "topright"
 
 #}
 
@@ -270,7 +270,6 @@ for (file_loop in 1:length(input_files)) {
    #tryCatch(plot(dates, data[["CO2..measured."]], ylab = expression(paste("Sea Surface pCO"[2]*" [",mu,"atm]")), xlab = "Time", ylim =  pCO2_ylims, cex.lab=1.5,cex.axis=1.3), error=function(e) {})
    tryCatch(plot(dates, data[["CO2..measured."]], ylab = expression(paste("Sea Surface pCO"[2]*" [ppm]")), xlab = "Time", ylim =  pCO2_ylims, cex.lab=1.5,cex.axis=1.3), error=function(e) {})
    legend(letter_location, letters[count], bty="n", cex=2.5)
-   #legend("bottomright", "d)", bty="n", cex=2.5)
    dev.off()
   }
   # If manually edit the axis ranges, give number of outliers not plotted in console

@@ -9,14 +9,14 @@ Sys.setlocale("LC_ALL", "English");
 ### The script has some input parameters:
 
 
-sepp <- "\t"
-CO2_col <- c(34)                        # This is for xCO2 or pCO2
+sepp <- ","# or "\t"
+CO2_col <- c(24)                        # This is for xCO2 or pCO2
 additional_CO2_col <- NA            # Use if are more than one co2 in raw file (xCO2 AND pCO2). Assign as NA if not relevant
-date_col <- c(24)
-time_col <- c(25)
-dt_format <- "%Y-%m-%d %H:%M:%S"  
+date_col <- c(2,3,4)
+time_col <- c(5,6,7)
+dt_format <- "%Y %m %d %H %M %S"  
 
-cycle_length <- 5                       # Approximate time between 2 measurements cycles (in hours)
+cycle_length <- 4                       # Approximate time between 2 measurements cycles (in hours)
 
 
 #-----------------
@@ -127,9 +127,14 @@ while (done==0) {
 # make plot
 png(paste(output_dir, "/", "2_one_cycle_", "plot.png", sep=""))
 par(mar=c(5,5,2,2))
-plot(df$date.time[beg2:ending2], df[[CO2_col]][beg2:ending2], ylab=expression("pCO"[2]*" ["*mu*"atm]"), xlab="Time", cex.lab=1.5,cex.axis=1.3, xaxt = "n")
-axis(1, tick=FALSE, df$date.time[beg2:ending2], format(df$date.time[beg2:ending2],"%Y-%m-%d %H:%M:%S"), cex.axis=1.3)
-legend("bottomright", "b)", bty="n", cex=2.5) 
+plot(df$date.time[beg2:ending2], df[[CO2_col]][beg2:ending2], 
+     ylab=expression("pCO"[2]*" ["*mu*"atm]"), xlab="Time", 
+#    ylim=c(min(df[[CO2_col]][beg2:ending2])-5, max(df[[CO2_col]][beg2:ending2])+5),
+     cex.lab=1.5,cex.axis=1.3, xaxt = "n")
+axis(1, tick=FALSE, df$date.time[beg2:ending2], 
+     format(df$date.time[beg2:ending2],"%Y-%m-%d \n %H:%M:%S"), 
+     cex.axis=1.0)
+#legend("topright", "b)", bty="n", cex=2.5) 
 dev.off()
 
 
